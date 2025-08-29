@@ -1,0 +1,17 @@
+Dataset,Model,Accuracy,Precision,Recall,F1 Score,ROC-AUC
+Preprocessed (All Features),Logistic Regression,0.881 ± 0.016,0.748 ± 0.094,0.401 ± 0.064,0.519 ± 0.069,0.836 ± 0.041
+Preprocessed (All Features),Random Forest,0.859 ± 0.015,0.798 ± 0.207,0.181 ± 0.049,0.292 ± 0.075,0.813 ± 0.043
+Preprocessed (All Features),XGBoost,0.862 ± 0.020,0.667 ± 0.146,0.312 ± 0.057,0.422 ± 0.072,0.791 ± 0.045
+Preprocessed (All Features),SVM,0.839 ± 0.003,0.000 ± 0.000,0.000 ± 0.000,0.000 ± 0.000,0.830 ± 0.042
+Preprocessed (Selected Features),Logistic Regression,0.884 ± 0.015,0.774 ± 0.096,0.401 ± 0.064,0.525 ± 0.067,0.837 ± 0.039
+Preprocessed (Selected Features),Random Forest,0.858 ± 0.016,0.774 ± 0.231,0.172 ± 0.056,0.280 ± 0.086,0.803 ± 0.039
+Preprocessed (Selected Features),XGBoost,0.857 ± 0.017,0.645 ± 0.134,0.300 ± 0.045,0.403 ± 0.050,0.802 ± 0.053
+Preprocessed (Selected Features),SVM,0.865 ± 0.016,0.844 ± 0.199,0.203 ± 0.069,0.322 ± 0.096,0.820 ± 0.047
+SMOTE Balanced (All Features),Logistic Regression,0.891 ± 0.019,0.916 ± 0.026,0.863 ± 0.025,0.888 ± 0.019,0.953 ± 0.010
+SMOTE Balanced (All Features),Random Forest,0.943 ± 0.018,0.964 ± 0.020,0.921 ± 0.027,0.942 ± 0.018,0.986 ± 0.005
+SMOTE Balanced (All Features),XGBoost,0.933 ± 0.013,0.958 ± 0.015,0.906 ± 0.029,0.931 ± 0.015,0.978 ± 0.009
+SMOTE Balanced (All Features),SVM,0.595 ± 0.119,0.458 ± 0.320,0.575 ± 0.399,0.490 ± 0.322,0.824 ± 0.033
+SMOTE Balanced (Selected Features),Logistic Regression,0.854 ± 0.017,0.861 ± 0.023,0.843 ± 0.020,0.852 ± 0.017,0.924 ± 0.014
+SMOTE Balanced (Selected Features),Random Forest,0.943 ± 0.011,0.965 ± 0.014,0.920 ± 0.022,0.941 ± 0.012,0.985 ± 0.006
+SMOTE Balanced (Selected Features),XGBoost,0.934 ± 0.017,0.959 ± 0.016,0.906 ± 0.027,0.931 ± 0.018,0.978 ± 0.008
+SMOTE Balanced (Selected Features),SVM,0.910 ± 0.019,0.923 ± 0.021,0.895 ± 0.035,0.908 ± 0.020,0.971 ± 0.008

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Attrition Risk Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .container {
+      width: 95%; max-width: 1200px; background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(15px); border-radius: 20px; padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25); color: #fff;
+    }
+    h1 { text-align: center; margin-bottom: 10px; font-size: 2rem; }
+    p.subtitle { text-align: center; margin-bottom: 25px; font-style: italic; color: #ddd; }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .field { display: flex; flex-direction: column; }
+    label { font-size: 0.9rem; margin-bottom: 6px; }
+    select, input {
+      padding: 8px 10px; border: none; border-radius: 8px;
+      background: rgba(255,255,255,0.2); color: #fff;
+    }
+    select:focus, input:focus { outline: 2px solid #00c6ff; }
+    option { color: #000; }
+
+    .btn {
+      background: linear-gradient(90deg,#00c6ff,#0072ff); border: none;
+      padding: 12px 25px; color: #fff; border-radius: 12px; font-size: 1rem;
+      cursor: pointer; transition: 0.3s ease; margin: 15px auto; display: block;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+    .result { text-align: center; margin-top: 20px; display: none; }
+    .badge {
+      display: inline-block; padding: 10px 20px; border-radius: 30px;
+      font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;
+    }
+    .badge.low { background: rgba(0,255,100,0.2); color: #0f0; }
+    .badge.high { background: rgba(255,100,100,0.2); color: #f66; }
+
+    .bar-container { height: 20px; background: rgba(255,255,255,0.1);
+      border-radius: 10px; overflow: hidden; margin: 8px 0;
+    }
+    .bar { height: 100%; width: 0; transition: width 1s ease; }
+    .bar.yes { background: linear-gradient(90deg,#ff4b2b,#ff416c); }
+    .bar.no { background: linear-gradient(90deg,#56ab2f,#a8e063); }
+
+    .gauge {
+      width: 200px; height: 100px; margin: 25px auto; position: relative;
+    }
+    .needle {
+      width: 4px; height: 90px; background: #fff; position: absolute;
+      bottom: 0; left: 50%; transform-origin: bottom center; transform: rotate(-90deg);
+      transition: transform 1s ease;
+    }
+    .download-btn {
+      margin-top: 20px; background: linear-gradient(90deg,#ff9a9e,#fad0c4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI-Powered Employee Retention Assistant</h1>
+    <p class="subtitle">Enter employee details and predict attrition risk instantly</p>
+
+    <form id="predictForm" class="grid"></form>
+    <button class="btn" type="submit" form="predictForm">Predict Risk</button>
+
+    <div class="result" id="result">
+      <div id="label" class="badge"></div>
+      <div class="gauge"><div class="needle" id="needle"></div></div>
+      <div><strong>Yes (Attrition):</strong> <span id="probYes">0%</span></div>
+      <div class="bar-container"><div class="bar yes" id="barYes"></div></div>
+      <div><strong>No (Stay):</strong> <span id="probNo">0%</span></div>
+      <div class="bar-container"><div class="bar no" id="barNo"></div></div>
+      <button class="btn download-btn" type="button" onclick="downloadReport()">Download Report</button>
+    </div>
+  </div>
+
+  <script>
+    // Flask -> JS data
+    const domain       = {{ domain|tojson|safe }};
+    const categorical  = {{ categorical_features|tojson|safe }};
+    const numeric      = {{ numeric_features|tojson|safe }};
+
+    const form = document.getElementById("predictForm");
+
+    // Build form fields
+    categorical.forEach(cat => {
+      const div = document.createElement("div"); div.className = "field";
+      div.innerHTML = `<label>${cat}</label><select name="${cat}">
+        ${(domain[cat] || []).map(v => `<option value="${v}">${v}</option>`).join("")}
+      </select>`;
+      form.appendChild(div);
+    });
+    numeric.forEach(num => {
+      const div = document.createElement("div"); div.className = "field";
+      div.innerHTML = `<label>${num}</label><input type="number" step="any" name="${num}" required>`;
+      form.appendChild(div);
+    });
+
+    // Submit
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const res  = await fetch("/predict", { method:"POST", body:data });
+      const out  = await res.json();
+      if(out.error){ alert(out.error); return; }
+
+      document.getElementById("result").style.display="block";
+      const probYes = (out.prob_yes*100).toFixed(1);
+      const probNo  = (out.prob_no*100).toFixed(1);
+
+      const labelEl = document.getElementById("label");
+      labelEl.textContent = out.label;
+      labelEl.className = "badge " + (out.label.includes("High") ? "high" : "low");
+
+      document.getElementById("probYes").textContent = probYes + "%";
+      document.getElementById("probNo").textContent  = probNo + "%";
+      document.getElementById("barYes").style.width  = probYes + "%";
+      document.getElementById("barNo").style.width   = probNo + "%";
+
+      const angle = -90 + (parseFloat(probYes) / 100) * 180;
+      document.getElementById("needle").style.transform = `rotate(${angle}deg)`;
+
+      window.lastResult = out;
+    });
+
+    function downloadReport(){
+      if(!window.lastResult) return;
+      const blob = new Blob([JSON.stringify(window.lastResult,null,2)],{type:"application/json"});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href = url; a.download = "attrition_report.json"; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
+
