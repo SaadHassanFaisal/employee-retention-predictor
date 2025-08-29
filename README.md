@@ -23,7 +23,7 @@ An **AI-powered system** that predicts employee attrition with **93.9% accuracy*
 - **Stacked Ensemble (Logistic Regression + Random Forest + Gradient Boosting)** achieved **93.9% accuracy**
 
 ### 5. Deployment
-- Built frontend with **HTML, CSS, JavaScript**  
+- Built frontend with **HTML, CSS, bit of JavaScript**  
 - Integrated **Flask API**  
 - Deployed with **ngrok tunnel** for real-time access  
 
